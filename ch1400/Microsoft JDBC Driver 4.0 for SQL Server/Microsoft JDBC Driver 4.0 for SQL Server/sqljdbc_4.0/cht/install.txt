@@ -1,0 +1,46 @@
+﻿安裝指示
+Microsoft JDBC Driver 4.0 for SQL Server
+
+
+簡介
+------------
+這些是解壓縮 sqljdbc_<version>_enu.exe 和 
+sqljdbc_<version>_enu.tar.gz 的指示。
+
+
+WINDOWS
+-------
+1. 讀取 license.txt 檔。下載並使用 Microsoft JDBC Driver 4.0 for SQL Server 即表示接受此授權。
+
+2. 將 sqljdbc_<version>_enu.exe 下載至暫存目錄。
+
+3. 執行 sqljdbc_<version>_enu.exe
+
+4. 出現提示時，請輸入安裝目錄；建議您將此 zip 檔案解壓縮至
+   %ProgramFiles% 下的預設目錄中：
+
+	Microsoft JDBC DRIVER 4.0 for SQL Server
+
+5. 將封裝解壓縮後，開啟 %InstallationDirectory%\Microsoft JDBC Driver 4.0 for SQL Server\sqljdbc_<version>\<language>\
+   help\default.htm，即可開啟 JDBC 說明系統。這樣網頁瀏覽器中就會顯示說明系統。
+
+
+UNIX
+----
+1. 讀取 license.txt 檔。下載並使用 Microsoft JDBC Driver 4.0 for SQL Server 即表示接受此授權。
+
+2. 將 sqljdbc_<version>_enu.tar.gz 下載至暫存目錄。
+
+3. 若要將壓縮的 tar 檔案解壓縮，請導覽至您要解壓縮
+   驅動程式的目錄，並輸入：
+
+	gzip -d sqljdbc_<version>_enu.tar.gz
+
+4. 若要將 tar 檔案解壓縮，請將其移至您要安裝驅動程式 
+   的目錄，並輸入：
+
+	tar -xf sqljdbc_<version>_enu.tar
+
+5. 將封裝解壓縮後，開啟 %InstallationDirectory%/Microsoft JDBC Driver 4.0 for SQL Server/sqljdbc_<version>/<language>/
+   help/default.htm，即可開啟 JDBC 說明系統。這樣預設的網頁瀏覽器中就會顯示 
+   說明系統。

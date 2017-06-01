@@ -1,0 +1,49 @@
+﻿<html xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:MSHelp="http://msdn.microsoft.com/mshelp" xmlns:mshelp="http://msdn.microsoft.com/mshelp" xmlns:ddue="http://ddue.schemas.microsoft.com/authoring/2003/5" xmlns:msxsl="urn:schemas-microsoft-com:xslt"><head><META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8" /><META NAME="save" CONTENT="history" /><title>資料來源範例</title><meta name="Language" content="zh-cht" /><meta name="System.Keywords" content="資料來源範例" /><meta name="Microsoft.Help.Id" content="b4a933ee-f2c6-4e0d-a96d-6dd061abf759" /><meta name="Description" content="此 Microsoft JDBC Driver for SQL Server 範例應用程式示範如何使用資料來源物件來連接到 SQL Server 資料庫。它也示範如何使用預存程序，從 SQL Server 資料庫擷取資料。" /><meta name="Microsoft.Help.ContentType" content="Samples" /><link rel="stylesheet" type="text/css" href="../local/Classic.css" /><script type="text/javascript" src="../scripts/EventUtilities.js">&amp;nbsp;</script><script type="text/javascript" src="../scripts/SplitScreen.js">&amp;nbsp;</script><script type="text/javascript" src="../scripts/Dropdown.js">&amp;nbsp;</script><script type="text/javascript" src="../scripts/script_manifold.js">&amp;nbsp;</script><script type="text/javascript" src="../scripts/script_feedBack.js">&amp;nbsp;</script><script type="text/javascript" src="../scripts/CheckboxMenu.js">&amp;nbsp;</script><script type="text/javascript" src="../scripts/CommonUtilities.js">&amp;nbsp;</script><script type="text/javascript" src="../local/script_main.js">&amp;nbsp;</script></head><body><div id="header"><table id="bottomTable" cellpadding="0" cellspacing="0"><tr><td align="left"><span id="headerBold">資料來源範例</span></td></tr></table><table id="gradientTable"><tr><td class="nsrBottom" background="../icons/gradient.gif" /></tr></table></div><div id="mainSection"><div id="mainBody"><div class="introduction"><p>此 Microsoft JDBC Driver for SQL Server 範例應用程式示範如何使用資料來源物件來連接到 SQL Server 資料庫。它也示範如何使用預存程序，從 SQL Server 資料庫擷取資料。</p><p>此範例的程式碼檔案名稱為 connectDS.java，可以在下列位置找到它：</p><p>&lt;<i>安裝目錄</i>&gt;\sqljdbc_&lt;<i>版本</i>&gt;\&lt;<i>語言</i>&gt;\help\samples\connections</p></div><h1 class="heading">需求</h1><div id="requirementsTitleSection" class="section" name="collapseableSection" style=""><p>若要執行此範例應用程式，您必須將 Classpath 設定為包含 sqljdbc.jar 檔案或 sqljdbc4.jar 檔案。如果 Classpath 遺漏 sqljdbc.jar 或 sqljdbc4.jar 的項目，範例應用程式將會擲回「找不到類別」的一般例外狀況。您也需要擁有 SQL Server 2005 AdventureWorks 範例資料庫的存取權。如需有關如何設定 Classpath 的詳細資訊，請參閱＜<span sdata="link"><a href="6faaf05b-8b70-4ed2-9b44-eee5897f1cd0.htm">使用 JDBC 驅動程式</a></span>＞。</p><div style="margin: .5em 1.5em .5em 1.5em"><b></b><p>Microsoft JDBC Driver for SQL Server 提供 sqljdbc.jar 和 sqljdbc4.jar 類別庫檔案，可根據您慣用的 Java Runtime Environment (JRE) 設定使用。如需有關應該選擇哪個 JAR 檔案的詳細資訊，請參閱＜<span sdata="link"><a href="447792bb-f39b-49b4-9fd0-1ef4154c74ab.htm">JDBC 驅動程式的系統需求</a></span>＞。</p></div></div><h1 class="heading">範例</h1><div id="exampleSection" class="section" name="collapseableSection" style=""><p>在下列範例中，範例程式碼會使用 <a href="097434fd-2b74-411c-a5ed-eba04481dde5.htm">SQLServerDataSource</a> 物件的 setter 方法設定各種連接屬性，然後呼叫 <b>SQLServerDataSource</b> 物件的 <a href="a15ee185-f433-4915-9c75-5ebd90c758fd.htm">getConnection</a> 方法，傳回 <a href="937292a6-1525-423e-a2b2-a18fd34c2893.htm">SQLServerConnection</a> 物件。</p><p>接著，範例程式碼會使用 <b>SQLServerConnection</b> 物件的 <a href="265b024c-898a-4bd0-98b5-f06076717b9e.htm">prepareCall</a>方法建立 <a href="30710a63-c05d-47d9-9cf9-c087a1c76373.htm">SQLServerCallableStatement</a> 物件，然後呼叫 <a href="dfff3358-f391-4af6-84c1-b94c029f506d.htm">executeQuery</a> 方法來執行預存程序。</p><p>最後，範例會使用從 <b>executeQuery</b> 方法傳回的 <a href="eaffcff1-286c-459f-83da-3150778480c9.htm">SQLServerResultSet</a> 物件，重複執行預存程序所傳回的結果。</p><div class="sampleCode"><span codeLanguage="other"><pre>import java.sql.*;
+import com.microsoft.sqlserver.jdbc.*;
+
+public class connectDS {
+
+   public static void main(String[] args) {
+
+      // Declare the JDBC objects.
+      Connection con = null;
+      CallableStatement cstmt = null;
+      ResultSet rs = null;
+
+      try {
+         // Establish the connection. 
+         SQLServerDataSource ds = new SQLServerDataSource();
+         ds.setUser("UserName");
+         ds.setPassword("*****");
+         ds.setServerName("localhost");
+         ds.setPortNumber(1433); 
+         ds.setDatabaseName("AdventureWorks");
+         con = ds.getConnection();
+
+         // Execute a stored procedure that returns some data.
+         cstmt = con.prepareCall("{call dbo.uspGetEmployeeManagers(?)}");
+         cstmt.setInt(1, 50);
+         rs = cstmt.executeQuery();
+
+         // Iterate through the data in the result set and display it.
+         while (rs.next()) {
+            System.out.println("EMPLOYEE: " + rs.getString("LastName") + 
+               ", " + rs.getString("FirstName"));
+            System.out.println("MANAGER: " + rs.getString("ManagerLastName") + 
+               ", " + rs.getString("ManagerFirstName"));
+            System.out.println();
+         }
+      }
+
+      // Handle any errors that may have occurred.
+      catch (Exception e) {
+         e.printStackTrace();
+      }
+      finally {
+         if (rs != null) try { rs.close(); } catch(Exception e) {}
+         if (cstmt != null) try { cstmt.close(); } catch(Exception e) {}
+         if (con != null) try { con.close(); } catch(Exception e) {}
+         System.exit(1);
+      }
+   }
+}</pre></span></div></div><span id="seeAlsoSpan"><h1 class="heading">請參閱</h1></span><div id="seeAlsoSection" class="section" name="collapseableSection" style=""><div class="seeAlsoStyle"><span sdata="link"><a href="ce43cc20-46a3-42ff-a3fb-75ad1ed10e08.htm">連接及擷取資料</a></span></div></div></div><div id="footer" class="section"><span id="feedbackarea">將有關本主題的<a href="javascript:SubmitFeedback('DevDocs@Microsoft.com','','','','8.0.12060.10000','%0\d感謝您的意見反應。開發人員撰寫小組會使用您的意見反應改善文件集。檢閱意見反應的同時，我們可能會傳送電子郵件給您要求提供進一步說明或是解決方案的意見。電子郵件地址不會用於任何其他目的，檢閱後將會刪除。%0\A如需有關%20Microsoft%20隱私權原則的詳細資訊，請參閱%20http://privacy.microsoft.com/zh-tw/default.aspx。%0\A%0\d','客戶回函');">意見反應</a>傳送給 Microsoft。</span><span id="copyrightarea"><p><a href="9bad553b-9e70-4696-8499-2e35f772a1e0.htm">© 2012 Microsoft.著作權所有，並保留一切權利。</a></p></span></div></div></body></html>

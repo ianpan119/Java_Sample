@@ -1,0 +1,64 @@
+﻿<html xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:MSHelp="http://msdn.microsoft.com/mshelp" xmlns:mshelp="http://msdn.microsoft.com/mshelp" xmlns:ddue="http://ddue.schemas.microsoft.com/authoring/2003/5" xmlns:msxsl="urn:schemas-microsoft-com:xslt"><head><META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8" /><META NAME="save" CONTENT="history" /><title>使用資料庫鏡像 (JDBC)</title><meta name="Language" content="zh-cht" /><meta name="System.Keywords" content="鏡像" /><meta name="Microsoft.Help.Id" content="4ff59218-0d3b-4274-b647-9839c4955865" /><meta name="Description" content="資料庫鏡像主要是一種用於增加資料庫可用性及資料備用性的軟體解決方案。Microsoft JDBC Driver for SQL Server 提供隱含的資料庫鏡像支援，所以在對資料庫設定資料庫鏡像時，開發人員不需撰寫任何程式碼或採取任何其他動作。" /><meta name="Microsoft.Help.ContentType" content="Concepts" /><link rel="stylesheet" type="text/css" href="../local/Classic.css" /><script type="text/javascript" src="../scripts/EventUtilities.js">&amp;nbsp;</script><script type="text/javascript" src="../scripts/SplitScreen.js">&amp;nbsp;</script><script type="text/javascript" src="../scripts/Dropdown.js">&amp;nbsp;</script><script type="text/javascript" src="../scripts/script_manifold.js">&amp;nbsp;</script><script type="text/javascript" src="../scripts/script_feedBack.js">&amp;nbsp;</script><script type="text/javascript" src="../scripts/CheckboxMenu.js">&amp;nbsp;</script><script type="text/javascript" src="../scripts/CommonUtilities.js">&amp;nbsp;</script><script type="text/javascript" src="../local/script_main.js">&amp;nbsp;</script></head><body><div id="header"><table id="bottomTable" cellpadding="0" cellspacing="0"><tr><td align="left"><span id="headerBold">使用資料庫鏡像 (JDBC)</span></td></tr></table><table id="gradientTable"><tr><td class="nsrBottom" background="../icons/gradient.gif" /></tr></table></div><div id="mainSection"><div id="mainBody"><div class="introduction"><p>資料庫鏡像主要是一種用於增加資料庫可用性及資料備用性的軟體解決方案。Microsoft JDBC Driver for SQL Server 提供隱含的資料庫鏡像支援，所以在對資料庫設定資料庫鏡像時，開發人員不需撰寫任何程式碼或採取任何其他動作。</p><p>資料庫鏡像是根據每一個資料庫來實作，它會在待命伺服器上保留 SQL Server 生產資料庫的副本。此伺服器不是熱待命伺服器就是暖待命伺服器，視資料庫鏡像工作階段的組態及狀態而定。熱待命伺服器支援迅速容錯移轉，不會失去已認可的交易，而暖待命伺服器則支援強制服務 (可能會失去資料)。</p><p>生產資料庫稱為<span class="term">主體</span>資料庫，而待命副本則稱為<span class="term">鏡像</span>資料庫。主體資料庫和鏡像資料庫必須位於個別的 SQL Server 執行個體 (伺服器執行個體)，而且它們應該位於個別的電腦上 (如果可能的話)。</p><p>生產伺服器執行個體 (稱為主體伺服器) 會與待命伺服器執行個體 (稱為鏡像伺服器) 通訊。主體伺服器及鏡像伺服器在資料庫鏡像工作階段內會是夥伴。如果主體伺服器失敗，則鏡像伺服器可以透過稱為<span class="term">容錯移轉</span>的程序，使鏡像伺服器的資料庫成為主體資料庫。例如，Partner_A 和 Partner_B 是兩部夥伴伺服器，主體資料庫起初位於 Partner_A (作為主體伺服器)，而鏡像資料庫則位於 Partner_B (作為鏡像伺服器)。如果 Partner_A 離線，則 Partner_B 上的資料庫可以容錯移轉，變成目前的主體資料庫。當 Partner_A 重新加入鏡像工作階段時，它會變成鏡像伺服器，而其資料庫將變成鏡像資料庫。</p><p>如果 Partner_A 伺服器遭到不能修理的損壞，則可將 Partner_C 伺服器連線，以充當 Partner_B (現在是主體伺服器) 的鏡像伺服器。然而，在此案例中，用戶端應用程式必須包括程式設計邏輯，以確定會以資料庫鏡像組態中使用的新伺服器名稱，更新連接字串屬性。否則，伺服器的連接可能會失敗。</p><p>替代的資料庫鏡像組態提供不同層次的效能及資料安全，並支援不同形式的容錯移轉。如需詳細資訊，請參閱《SQL Server 線上叢書》中的＜資料庫鏡像概觀＞。</p></div><h1 class="heading">程式設計考量</h1><div id="sectionSection0" class="section" name="collapseableSection" style=""><p>當主體資料庫伺服器失敗時，用戶端應用程式會收到回應 API 呼叫的錯誤，這指出已失去資料庫的連接。當發生這種情況時，將失去任何未認可的資料庫變更，而且將回復目前的交易。如果發生這種情況，應用程式應該關閉連接 (或釋出資料來源物件)，然後嘗試重新開啟它。連接時，新的連接會以透明方式重新導向至鏡像資料庫 (現在是作為主體伺服器)，而且用戶端不需修改連接字串或資料來源物件。</p><p>在最初建立連接時，主體伺服器會將其容錯移轉夥伴的身分，傳送給發生容錯移轉時將使用的用戶端。當應用程式嘗試與失敗的主體伺服器建立初始連接時，用戶端並不知道容錯移轉夥伴的身分。若要讓用戶端有機會處理此案例，failoverPartner 連接字串屬性及選用的 <a href="5310b7c2-9d10-474f-ad3a-218fe5da694b.htm">setFailoverPartner</a> 資料來源方法，可讓用戶端指定自己的容錯移轉夥伴身分。此用戶端屬性只會在此案例中使用；如果主體伺服器可用，就不會使用。</p><div style="margin: .5em 1.5em .5em 1.5em"><b></b><p>在連接字串中或利用資料來源物件指定 failoverPartner 時，也必須設定 databaseName 屬性，否則將擲回例外狀況。如果未明確指定 failoverPartner 和 databaseName，當主體資料庫伺服器失敗時，應用程式將不會嘗試容錯移轉。換句話說，透明的重新導向僅適用於明確指定 failoverPartner 和 databaseName 的連接。如需 failoverPartner 及其他連接字串屬性的詳細資訊，請參閱＜<span sdata="link"><a href="f1b62700-f046-488d-bd6b-a5cd8fc345b7.htm">設定連接屬性</a></span>＞。</p></div><p>如果用戶端所提供的容錯移轉夥伴伺服器並未參照當做指定資料庫之容錯移轉夥伴的伺服器，而且如果所參照的伺服器/資料庫處於鏡像排列中，伺服器會拒絕連接。雖然 <a href="097434fd-2b74-411c-a5ed-eba04481dde5.htm">SQLServerDataSource</a> 類別提供 <a href="885f927f-9c48-42e0-a7fb-fd936d2b8130.htm">getFailoverPartner</a> 方法，但是此方法只會傳回連接字串或 <b>setFailoverPartner</b> 方法中所指定容錯移轉夥伴的名稱。若要擷取目前正在使用之真正容錯移轉夥伴的名稱，請使用下列 Transact-SQL 陳述式：</p><div class="sampleCode"><span codeLanguage="other"><pre>SELECT m.mirroring_role_DESC, m.mirroring_state_DESC,
+m.mirroring_partner_instance FROM sys.databases as db,
+sys.database_mirroring AS m WHERE db.name = 'MirroringDBName'
+AND db.database_id = m.database_id</pre></span></div><div style="margin: .5em 1.5em .5em 1.5em"><b></b><p>您需要變更此陳述式，以使用您的鏡像資料庫名稱。</p></div><p>您應該考慮快取夥伴資訊以更新連接字串，或設計如果第一次嘗試建立連接失敗時要進行的重試策略。</p></div><h1 class="heading">範例</h1><div id="sectionSection1" class="section" name="collapseableSection" style=""><p>在下列範例中，第一次會嘗試連接至主體伺服器。如果失敗並發生例外狀況，則會嘗試連接至鏡像伺服器 (鏡像伺服器可能已升級為新的主體伺服器)。請注意，連接字串中有使用 failoverPartner 屬性。</p><div class="sampleCode"><span codeLanguage="other"><pre>import java.sql.*;
+
+public class clientFailover {
+
+   public static void main(String[] args) {
+
+      // Create a variable for the connection string.
+      String connectionUrl = "jdbc:sqlserver://serverA:1433;" +
+         "databaseName=AdventureWorks;integratedSecurity=true;" +
+         "failoverPartner=serverB";
+
+      // Declare the JDBC objects.
+      Connection con = null;
+      Statement stmt = null;
+
+      try {
+         // Establish the connection to the principal server.
+         Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+         con = DriverManager.getConnection(connectionUrl);
+         System.out.println("Connected to the principal server.");
+
+         // Note that if a failover of serverA occurs here, then an
+         // exception will be thrown and the failover partner will
+         // be used in the first catch block below.
+
+         // Create and execute an SQL statement that inserts some data.
+         stmt = con.createStatement();
+
+         // Note that the following statement assumes that the 
+         // TestTable table has been created in the AdventureWorks
+         // sample database.
+         stmt.executeUpdate("INSERT INTO TestTable (Col2, Col3) VALUES ('a', 10)");
+      }
+
+      // Handle any errors that may have occurred.
+      catch (SQLException se) {
+         try {
+            // The connection to the principal server failed,
+            // try the mirror server which may now be the new
+            // principal server.
+            System.out.println("Connection to principal server failed, " +
+            "trying the mirror server.");
+            con = DriverManager.getConnection(connectionUrl);
+            System.out.println("Connected to the new principal server.");
+            stmt = con.createStatement();
+            stmt.executeUpdate("INSERT INTO TestTable (Col2, Col3) VALUES ('a', 10)");
+         }
+         catch (Exception e) {
+            e.printStackTrace();
+         }
+      }
+      catch (Exception e) {
+         e.printStackTrace();
+      }
+      // Close the JDBC objects.
+      finally {
+         if (stmt != null) try { stmt.close(); } catch(Exception e) {}
+         if (con != null) try { con.close(); } catch(Exception e) {}
+      }
+   }
+}</pre></span></div></div><span id="seeAlsoSpan"><h1 class="heading">請參閱</h1></span><div id="seeAlsoSection" class="section" name="collapseableSection" style=""><div class="seeAlsoStyle"><span sdata="link"><a href="94bcfbe3-f00e-4774-bda8-bb7577518fec.htm">使用 JDBC 驅動程式連接到 SQL Server</a></span></div></div></div><div id="footer" class="section"><span id="feedbackarea">將有關本主題的<a href="javascript:SubmitFeedback('DevDocs@Microsoft.com','','','','8.0.12060.10000','%0\d感謝您的意見反應。開發人員撰寫小組會使用您的意見反應改善文件集。檢閱意見反應的同時，我們可能會傳送電子郵件給您要求提供進一步說明或是解決方案的意見。電子郵件地址不會用於任何其他目的，檢閱後將會刪除。%0\A如需有關%20Microsoft%20隱私權原則的詳細資訊，請參閱%20http://privacy.microsoft.com/zh-tw/default.aspx。%0\A%0\d','客戶回函');">意見反應</a>傳送給 Microsoft。</span><span id="copyrightarea"><p><a href="9bad553b-9e70-4696-8499-2e35f772a1e0.htm">© 2012 Microsoft.著作權所有，並保留一切權利。</a></p></span></div></div></body></html>

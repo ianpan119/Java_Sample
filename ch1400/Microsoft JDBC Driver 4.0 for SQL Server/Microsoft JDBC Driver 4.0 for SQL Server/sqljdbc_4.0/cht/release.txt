@@ -1,0 +1,126 @@
+﻿版本資訊
+Microsoft JDBC Driver 4.0 for SQL Server
+2012 年 3 月
+
+
+簡介
+------------
+本檔案包含最新資訊或補充 Microsoft JDBC Driver 4.0 for SQL Server
+文件的其他重要資訊。安裝 JDBC 驅動程式前，您應該完整
+閱讀本檔案。
+
+您的意見對我們非常重要，我們會盡力即時回覆您的意見。如需有關使用
+JDBC 驅動程式部落格與線上論壇提供意見的詳細資訊，
+請參閱 Microsoft JDBC Driver 4.0 for SQL Server 頁面，
+網址為：http://msdn.microsoft.com/data/jdbc。
+
+
+安裝
+------------
+安裝 JDBC 驅動程式的指示位於 install.txt 中。
+如需有關在 Windows 和 Unix 作業系統上安裝 JDBC 驅動程式的詳細資訊，請參閱該檔案。
+
+支援的作業系統
+---------------------------
+Microsoft JDBC Driver 4.0 for SQL Server 支援下列作業系統：
+Linux、Unix、Windows Server 2008、
+Windows Vista Service Pack 1、Windows Server 2008 R2 和 Windows 7。
+
+上述清單為部分支援的作業系統範例。
+JDBC 驅動程式設計為可以在支援使用 Java Virtual Machine (JVM)
+的任何作業系統上運作。不過，僅在 Sun Solaris、SUSE
+Linux 及 Windows Vista Service Pack 1 或更新版本的作業系統上測試過。
+
+版本內容
+----------------
+Microsoft JDBC Driver 4.0 for SQL Server 可執行的 zip 或 tar 檔案
+會將下列檔案解壓縮到相對於所選安裝目錄
+之指定的位置：
+
+<installation directory>\sqljdbc_<version>\<language>\install.txt
+<installation directory>\sqljdbc_<version>\<language>\release.txt
+<installation directory>\sqljdbc_<version>\<language>\license.txt
+<installation directory>\sqljdbc_<version>\<language>\sqljdbc.jar
+<installation directory>\sqljdbc_<version>\<language>\sqljdbc4.jar
+<installation directory>\sqljdbc_<version>\<language>\auth\x86\sqljdbc_auth.dll
+<installation directory>\sqljdbc_<version>\<language>\auth\x64\sqljdbc_auth.dll
+<installation directory>\sqljdbc_<version>\<language>\help\default.htm
+<installation directory>\sqljdbc_<version>\<language>\help\index.htm
+<installation directory>\sqljdbc_<version>\<language>\help\toc.htm
+<installation directory>\sqljdbc_<version>\<language>\help\html\<doc pages...>
+<installation directory>\sqljdbc_<version>\<language>\help\local\<doc files...>
+<installation directory>\sqljdbc_<version>\<language>\help\samples\<sample files...>
+<installation directory>\sqljdbc_<version>\<language>\xa\xa_install.sql
+<installation directory>\sqljdbc_<version>\<language>\xa\x86\sqljdbc_xa.dll
+<installation directory>\sqljdbc_<version>\<language>\xa\x64\sqljdbc_xa.dll
+
+
+變更清單
+-----------
+從 3.0 變更至 4.0：
+
+1765616 DatabaseMetadata.getTypeInfo 現在針對 katmai 和更新版本的 date、time、datetime2、datetimeoffset 傳回新的 java.sql.Type 值
+
+1764334 新增 JDBC XA Timeout 和 XID 的追蹤支援
+
+1750318 現在 SQLServerDatabaseMetaData 函數在重複使用共用連接時可正確運作。
+
+1768845 setTimestamp 和 updateTimestamp 的行為在關於四捨五入方面已經一致。資料在傳送至伺服器之前 
+        會先由驅動程式四捨五入為 7 個小數位數。
+
+1770134 時間後端類型上具有最大值 (23:59:59.999) 的 updateTime 現在已有正確的四捨五入行為
+
+1761042 DataSource 布林值屬性現在會記錄結束呼叫
+
+1750330 更新的 XA SQL 指令碼可避免初次執行時的誤導錯誤
+
+1761393 改良的 unwrap 方法追蹤
+
+1945579 DatabaseMetaData.getSchemas 現在可以搭配 SQL Azure 及 SQL Server 針對所有定序正確運作。
+
+1963089 hostNameInCertificate 連接屬性不再是對 SQL Azure 驗證 SSL 憑證的強制項目。
+
+1958531 如果沒有設定資料庫鏡像的伺服器連接在登入時失敗 (例如，資料庫不存在)，驅動程式不會自動重試。
+
+1954701 插入重複的資料列時會擲回的例外狀況現在包含 SQLState 23000。
+
+2055259 整合式驗證在載入 sqljdbc_auth.dll 之後失敗時所產生的錯誤訊息已增強。
+
+2083373 使用 SQL Azure 時，包含無效引數的大型參數化查詢現在會在沒有關閉連接的情況下擲回例外狀況。
+
+2084385 getDate、getTimestamp、getDateTimeOffset 現在可搭配 JRE 1.7 傳回所有日期的正確值。
+
+2105115 從 DatabaseMetaData.getColumns 取得的 ResultSet 的 getObject 現在可正確運作。
+
+
+已知問題
+------------
+下列為 Microsoft JDBC Driver 4.0 for SQL Server 的已知問題：
+
+1) SQL MERGE 陳述式的參數中繼資料限制
+
+搭配參數化 MERGE 查詢使用時，PreparedStatement.getParameterMetadata()
+會擲回 SQLException。
+
+
+2) JavaKerberos 和 IBM VM
+
+如果您是在 Windows 環境下執行，可能需要在組態檔中指定主要名稱，以便讓 Java Kerberos 能夠運作。例如：
+SQLJDBCDriver {
+com.ibm.security.auth.module.Krb5LoginModule required  useDefaultCcache=true credsType=initiator principal=principalname@principaldomain;
+};
+
+
+3) 使用 SQL AZURE 時連接中斷
+
+連接到 SQL Azure 時，網路元件 (例如防火牆) 可能會在一段時間沒有活動之後終止閒置連接。若要避免網路元件中斷閒置連接，您應該在載入此驅動程式的作業
+系統上設定下列登錄設定 (或其非 Windows 對等項目)：
+           
+           登錄設定                                                                     建議值
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\KeepAliveTime                 30000
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\KeepAliveInterval             1000
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\TcpMaxDataRetransmission      10
+  
+
+
+

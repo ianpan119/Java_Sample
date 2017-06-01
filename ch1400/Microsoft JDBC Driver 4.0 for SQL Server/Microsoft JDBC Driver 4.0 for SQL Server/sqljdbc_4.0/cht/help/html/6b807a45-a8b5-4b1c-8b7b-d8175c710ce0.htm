@@ -1,0 +1,29 @@
+﻿<html xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:MSHelp="http://msdn.microsoft.com/mshelp" xmlns:mshelp="http://msdn.microsoft.com/mshelp" xmlns:ddue="http://ddue.schemas.microsoft.com/authoring/2003/5" xmlns:msxsl="urn:schemas-microsoft-com:xslt"><head><META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8" /><META NAME="save" CONTENT="history" /><title>處理複雜陳述式</title><meta name="Language" content="zh-cht" /><meta name="Microsoft.Help.Id" content="6b807a45-a8b5-4b1c-8b7b-d8175c710ce0" /><meta name="Description" content="使用 Microsoft JDBC Driver for SQL Server 時，您可能必須處理複雜陳述式，包括在執行階段動態產生的陳述式。複雜陳述式通常執行各種不同的工作，包括更新、插入與刪除。這些類型的陳述式也可能傳回多個結果集和輸出參數。在這些情況下，執行陳述式的 Java 程式碼事先可能不知道傳回的物件和資料的類型和數目。" /><meta name="Microsoft.Help.ContentType" content="Concepts" /><link rel="stylesheet" type="text/css" href="../local/Classic.css" /><script type="text/javascript" src="../scripts/EventUtilities.js">&amp;nbsp;</script><script type="text/javascript" src="../scripts/SplitScreen.js">&amp;nbsp;</script><script type="text/javascript" src="../scripts/Dropdown.js">&amp;nbsp;</script><script type="text/javascript" src="../scripts/script_manifold.js">&amp;nbsp;</script><script type="text/javascript" src="../scripts/script_feedBack.js">&amp;nbsp;</script><script type="text/javascript" src="../scripts/CheckboxMenu.js">&amp;nbsp;</script><script type="text/javascript" src="../scripts/CommonUtilities.js">&amp;nbsp;</script><script type="text/javascript" src="../local/script_main.js">&amp;nbsp;</script></head><body><div id="header"><table id="bottomTable" cellpadding="0" cellspacing="0"><tr><td align="left"><span id="headerBold">處理複雜陳述式</span></td></tr></table><table id="gradientTable"><tr><td class="nsrBottom" background="../icons/gradient.gif" /></tr></table></div><div id="mainSection"><div id="mainBody"><div class="introduction"><p>使用 Microsoft JDBC Driver for SQL Server 時，您可能必須處理複雜陳述式，包括在執行階段動態產生的陳述式。複雜陳述式通常執行各種不同的工作，包括更新、插入與刪除。這些類型的陳述式也可能傳回多個結果集和輸出參數。在這些情況下，執行陳述式的 Java 程式碼事先可能不知道傳回的物件和資料的類型和數目。</p><p>為了有效處理複雜陳述式，JDBC 驅動程式提供一些方法來查詢傳回的物件和資料，使應用程式可以正確處理它們。處理複雜陳述式的關鍵在於 <a href="ec24963c-8b51-4838-91e9-1fbfa2347451.htm">SQLServerStatement</a> 類別的 <a href="e1367f39-23d7-4e26-b160-6d988d7e6988.htm">execute</a> 方法。此方法會傳回 <span sdata="langKeyword" value="boolean"><span class="keyword">boolean</span></span> 值。若此值為 true，則從陳述式傳回的第一個結果是結果集。當此值為 false，則傳回的第一個結果是更新計數。</p><p>當您知道傳回的物件或資料的類型時，可使用 <a href="929a14e2-8e98-4c32-89aa-86733c717ec1.htm">getResultSet</a> 或 <a href="e9570228-4500-44b6-b2f1-84ac050b5112.htm">getUpdateCount</a> 方法來處理該資料。若要處理從複雜陳述式傳回的下一個物件或資料，您可以呼叫 <a href="df89db50-0b2f-4094-820a-30be25ad72fe.htm">getMoreResults</a> 方法。</p><p>在下列範例中，連至 SQL Server 2005 AdventureWorks 範例資料庫的開啟連接會傳遞至函數中，建構一個結合預存程序呼叫與 SQL 陳述式的複雜陳述式，接著執行陳述式，然後使用 <span class="code">do</span> 迴圈來處理傳回的所有結果集和更新的計數。</p><div name="snippetGroup"><div class="sampleCode"><span codeLanguage="Java"><pre>public static void executeComplexStatement(Connection con) {
+   try {
+      String sqlStringWithUnknownResults = "{call dbo.uspGetEmployeeManagers(50)};SELECT TOP 10 * FROM Person.Contact";
+      Statement stmt = con.createStatement();
+      boolean results = stmt.execute(sqlStringWithUnknownResults);
+      int count = 0;
+      do {
+         if (results) {
+            ResultSet rs = stmt.getResultSet();
+            System.out.println("Result set data displayed here.");
+            rs.close();
+         } else {
+            count = stmt.getUpdateCount();
+            if (count &gt;= 0) {
+               System.out.println("DDL or update data displayed here.");
+            } else {
+               System.out.println("No more results to process.");
+            }
+         }
+         results = stmt.getMoreResults();
+      } while (results || count != -1);
+      stmt.close();
+   }
+   catch (Exception e) {
+      e.printStackTrace();
+   }
+}
+
+</pre></span></div></div></div><span id="seeAlsoSpan"><h1 class="heading">請參閱</h1></span><div id="seeAlsoSection" class="section" name="collapseableSection" style=""><div class="seeAlsoStyle"><span sdata="link"><a href="7f8f3e8f-841e-4449-9154-b5366870121f.htm">搭配 JDBC Driver 使用陳述式</a></span></div></div></div><div id="footer" class="section"><span id="feedbackarea">將有關本主題的<a href="javascript:SubmitFeedback('DevDocs@Microsoft.com','','','','8.0.12060.10000','%0\d感謝您的意見反應。開發人員撰寫小組會使用您的意見反應改善文件集。檢閱意見反應的同時，我們可能會傳送電子郵件給您要求提供進一步說明或是解決方案的意見。電子郵件地址不會用於任何其他目的，檢閱後將會刪除。%0\A如需有關%20Microsoft%20隱私權原則的詳細資訊，請參閱%20http://privacy.microsoft.com/zh-tw/default.aspx。%0\A%0\d','客戶回函');">意見反應</a>傳送給 Microsoft。</span><span id="copyrightarea"><p><a href="9bad553b-9e70-4696-8499-2e35f772a1e0.htm">© 2012 Microsoft.著作權所有，並保留一切權利。</a></p></span></div></div></body></html>

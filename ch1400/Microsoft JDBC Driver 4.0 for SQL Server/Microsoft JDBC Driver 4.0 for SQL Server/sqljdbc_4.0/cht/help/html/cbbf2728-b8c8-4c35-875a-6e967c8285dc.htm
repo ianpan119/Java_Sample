@@ -1,0 +1,52 @@
+﻿<html xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:MSHelp="http://msdn.microsoft.com/mshelp" xmlns:mshelp="http://msdn.microsoft.com/mshelp" xmlns:ddue="http://ddue.schemas.microsoft.com/authoring/2003/5" xmlns:msxsl="urn:schemas-microsoft-com:xslt"><head><META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8" /><META NAME="save" CONTENT="history" /><title>unwrap 方法 (SQLServerCallableStatement)</title><meta name="Language" content="zh-cht" /><meta name="Microsoft.Help.Id" content="cbbf2728-b8c8-4c35-875a-6e967c8285dc" /><meta name="Description" content="傳回可實作指定之介面的物件，此介面可允許存取 Microsoft JDBC Driver for SQL Server 特有的方法。" /><meta name="Microsoft.Help.ContentType" content="Reference" /><link rel="stylesheet" type="text/css" href="../local/Classic.css" /><script type="text/javascript" src="../scripts/EventUtilities.js">&amp;nbsp;</script><script type="text/javascript" src="../scripts/SplitScreen.js">&amp;nbsp;</script><script type="text/javascript" src="../scripts/Dropdown.js">&amp;nbsp;</script><script type="text/javascript" src="../scripts/script_manifold.js">&amp;nbsp;</script><script type="text/javascript" src="../scripts/script_feedBack.js">&amp;nbsp;</script><script type="text/javascript" src="../scripts/CheckboxMenu.js">&amp;nbsp;</script><script type="text/javascript" src="../scripts/CommonUtilities.js">&amp;nbsp;</script><script type="text/javascript" src="../local/script_main.js">&amp;nbsp;</script></head><body><div id="header"><table id="bottomTable" cellpadding="0" cellspacing="0"><tr><td align="left"><span id="headerBold">unwrap 方法 (SQLServerCallableStatement)</span></td></tr></table><table id="gradientTable"><tr><td class="nsrBottom" background="../icons/gradient.gif" /></tr></table></div><div id="mainSection"><div id="mainBody"><div class="introduction"><p>傳回可實作指定之介面的物件，此介面可允許存取 Microsoft JDBC Driver for SQL Server 特有的方法。</p></div><h1 class="heading">語法</h1><div id="syntaxSection" class="section"><div class="sampleCode"><span codeLanguage="other"><pre>
+public &lt;T&gt; T <b>unwrap</b>(Class&lt;T&gt; <span class="parameter" sdata="paramReference">iface</span>)</pre></span></div></div><h1 class="heading">參數</h1><div id="parametersSection" class="section" name="collapseableSection" style=""><p><span class="parameter" sdata="paramReference">iface</span></p><p><b>T</b> 類型的類別，可定義介面。</p></div><h1 class="heading">傳回值</h1><div id="returnValueSection" class="section" name="collapseableSection" style=""><p>物件，可實作指定的介面。</p></div><h1 class="heading">例外狀況</h1><div id="ddueExceptionsSection" class="section" name="collapseableSection" style=""><p><a href="af5ef257-7cf6-4db3-b1ee-07d22d82bef1.htm">SQLServerException</a></p></div><h1 class="heading">備註</h1><div id="languageReferenceRemarksSection" class="section" name="collapseableSection" style=""><p><a href="cbbf2728-b8c8-4c35-875a-6e967c8285dc.htm">unwrap</a> 方法是由已自 JDBC 4.0 規格中導入的 java.sql.Wrapper 介面所定義。</p><p>應用程式可能必須存取 Microsoft JDBC Driver for SQL Server 特有的 JDBC API 延伸模組。在類別公開供應商延伸模組的情況下，<b>unwrap</b> 方法支援解除包裝成為這個物件可延伸的公用類別。</p><p><a href="30710a63-c05d-47d9-9cf9-c087a1c76373.htm">SQLServerCallableStatement</a> 會實作 <a href="a8481c06-fbba-432b-8c69-4f4619c20ad4.htm">ISQLServerPreparedStatement</a>，後者是從 <a href="ec24963c-8b51-4838-91e9-1fbfa2347451.htm">ISQLServerStatement</a> 擴充而來。當呼叫這個方法時，該物件會解除包裝成為下列類別：<a href="ec24963c-8b51-4838-91e9-1fbfa2347451.htm">SQLServerStatement</a>、<a href="a8481c06-fbba-432b-8c69-4f4619c20ad4.htm">SQLServerPreparedStatement</a> 和 <a href="30710a63-c05d-47d9-9cf9-c087a1c76373.htm">SQLServerCallableStatement</a>。</p><p>如需詳細資訊，請參閱＜<span sdata="link"><a href="27fc9b72-9f21-4728-abcb-5c015f28a6ab.htm">包裝函式與介面</a></span>＞。</p><p>下面範例程式碼會示範如何使用 <b>isWrapperFor</b> 和 <b>unwrap</b> 方法來核取驅動程式延伸模組，以及叫用供應商特有的方法，例如 <a href="9f489835-6cda-4c8c-b139-079639a169cf.htm">setResponseBuffering</a> 和 <a href="a9a9ffdd-7ce3-4e0a-907c-34d6a54e6865.htm">getResponseBuffering</a>。</p><div class="sampleCode"><span codeLanguage="other"><pre>public static void executeStoredProcedure(Connection con) {
+   try {
+    CallableStatement cstmt = 
+       con.prepareCall("{call dbo.stored_proc_name(?, ?)}");
+    
+    // The recommended way to access the JDBC 
+    // Driver-specific methods is to use the JDBC 4.0 Wrapper 
+    // functionality. 
+    // The following code statements demonstrates how to use the 
+    // isWrapperFor and unwrap methods
+    // to access the driver-specific response buffering methods.
+
+    if (cstmt.isWrapperFor(
+      com.microsoft.sqlserver.jdbc.SQLServerCallableStatement.class)) {
+     // The CallableStatement object can unwrap to 
+     // SQLServerCallableStatement.
+     SQLServerCallableStatement SQLcstmt = 
+     cstmt.unwrap(
+        com.microsoft.sqlserver.jdbc.SQLServerCallableStatement.class);
+     SQLcstmt.setResponseBuffering("adaptive");
+     System.out.println("Response buffering mode has been set to " +
+         SQLcstmt.getResponseBuffering());
+     }
+     
+    if (cstmt.isWrapperFor(
+      com.microsoft.sqlserver.jdbc.SQLServerPreparedStatement.class)) {
+      // The CallableStatement object can unwrap to 
+      // SQLServerPreparedStatement.                  
+      SQLServerPreparedStatement SQLpstmt = 
+       cstmt.unwrap(
+       com.microsoft.sqlserver.jdbc.SQLServerPreparedStatement.class);
+      SQLpstmt.setResponseBuffering("adaptive");
+      System.out.println("Response buffering mode has been set to " +
+          SQLpstmt.getResponseBuffering());
+    }
+    if (cstmt.isWrapperFor(
+      com.microsoft.sqlserver.jdbc.SQLServerStatement.class)) {
+
+      // The CallableStatement object can unwrap to SQLServerStatement. 
+      SQLServerStatement SQLstmt = 
+        cstmt.unwrap(
+        com.microsoft.sqlserver.jdbc.SQLServerStatement.class);
+      SQLstmt.setResponseBuffering("adaptive");
+      System.out.println("Response buffering mode has been set to " +
+      SQLstmt.getResponseBuffering());
+    }
+  }
+  catch (Exception e) {
+     e.printStackTrace();
+  }
+} </pre></span></div></div><span id="seeAlsoSpan"><h1 class="heading">請參閱</h1></span><div id="seeAlsoSection" class="section" name="collapseableSection" style=""><div class="seeAlsoStyle"><span sdata="link"><a href="71156863-3588-453e-b5a5-0573b2c1bebf.htm">isWrapperFor 方法 (SQLServerCallableStatement)</a></span></div><div class="seeAlsoStyle"><span sdata="link"><a href="30710a63-c05d-47d9-9cf9-c087a1c76373.htm">SQLServerCallableStatement 類別</a></span></div><div class="seeAlsoStyle"><span sdata="link"><a href="5ebdc186-e50f-4d14-bbf4-95af5051e4a4.htm">SQLServerCallableStatement 成員</a></span></div></div></div><div id="footer" class="section"><span id="feedbackarea">將有關本主題的<a href="javascript:SubmitFeedback('DevDocs@Microsoft.com','','','','8.0.12060.10000','%0\d感謝您的意見反應。開發人員撰寫小組會使用您的意見反應改善文件集。檢閱意見反應的同時，我們可能會傳送電子郵件給您要求提供進一步說明或是解決方案的意見。電子郵件地址不會用於任何其他目的，檢閱後將會刪除。%0\A如需有關%20Microsoft%20隱私權原則的詳細資訊，請參閱%20http://privacy.microsoft.com/zh-tw/default.aspx。%0\A%0\d','客戶回函');">意見反應</a>傳送給 Microsoft。</span><span id="copyrightarea"><p><a href="9bad553b-9e70-4696-8499-2e35f772a1e0.htm">© 2012 Microsoft.著作權所有，並保留一切權利。</a></p></span></div></div></body></html>

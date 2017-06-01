@@ -1,0 +1,21 @@
+﻿<html xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:MSHelp="http://msdn.microsoft.com/mshelp" xmlns:mshelp="http://msdn.microsoft.com/mshelp" xmlns:ddue="http://ddue.schemas.microsoft.com/authoring/2003/5" xmlns:msxsl="urn:schemas-microsoft-com:xslt"><head><META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8" /><META NAME="save" CONTENT="history" /><title>使用結果集中繼資料</title><meta name="Language" content="zh-cht" /><meta name="System.Keywords" content="結果集中繼資料" /><meta name="Microsoft.Help.Id" content="5e37529a-30db-48c8-b90a-ae9657d0f6b0" /><meta name="Description" content="為了查詢結果集內所包含之資料行的資訊，Microsoft JDBC Driver for SQL Server 會實作 SQLServerResultSetMetaData 類別。此類別包含數種以單一值形式傳回資訊的方法。" /><meta name="Microsoft.Help.ContentType" content="Concepts" /><link rel="stylesheet" type="text/css" href="../local/Classic.css" /><script type="text/javascript" src="../scripts/EventUtilities.js">&amp;nbsp;</script><script type="text/javascript" src="../scripts/SplitScreen.js">&amp;nbsp;</script><script type="text/javascript" src="../scripts/Dropdown.js">&amp;nbsp;</script><script type="text/javascript" src="../scripts/script_manifold.js">&amp;nbsp;</script><script type="text/javascript" src="../scripts/script_feedBack.js">&amp;nbsp;</script><script type="text/javascript" src="../scripts/CheckboxMenu.js">&amp;nbsp;</script><script type="text/javascript" src="../scripts/CommonUtilities.js">&amp;nbsp;</script><script type="text/javascript" src="../local/script_main.js">&amp;nbsp;</script></head><body><div id="header"><table id="bottomTable" cellpadding="0" cellspacing="0"><tr><td align="left"><span id="headerBold">使用結果集中繼資料</span></td></tr></table><table id="gradientTable"><tr><td class="nsrBottom" background="../icons/gradient.gif" /></tr></table></div><div id="mainSection"><div id="mainBody"><div class="introduction"><p>為了查詢結果集內所包含之資料行的資訊，Microsoft JDBC Driver for SQL Server 會實作 <a href="9a36885f-83f3-44af-85f0-2b849dfd20d4.htm">SQLServerResultSetMetaData</a> 類別。此類別包含數種以單一值形式傳回資訊的方法。</p><p>若要建立 <b>SQLServerResultSetMetaData</b> 物件，您可以使用 <a href="eaffcff1-286c-459f-83da-3150778480c9.htm">SQLServerResultSet</a> 類別的 <a href="9dcdbf69-1d47-422c-842e-0bed5afdcb93.htm">getMetaData</a> 方法。</p><p>在下列範例中，連至 SQL Server 2005 AdventureWorks 範例資料庫的開啟連接會傳遞至函數中，使用 <b>SQLServerResultSet</b> 類別的 <b>getMetaData</b> 方法來傳回 <b>SQLServerResultSetMetaData</b> 物件，然後使用 <b>SQLServerResultSetMetaData</b> 物件的各種方法來顯示有關結果集內包含的資料行名稱和資料類型的資訊。</p><div name="snippetGroup"><div class="sampleCode"><span codeLanguage="Java"><pre>public static void getResultSetMetaData(Connection con) {
+   try {
+      String SQL = "SELECT TOP 10 * FROM Person.Contact";
+      Statement stmt = con.createStatement();
+      ResultSet rs = stmt.executeQuery(SQL);
+      ResultSetMetaData rsmd = rs.getMetaData();
+
+      // Display the column name and type.
+      int cols = rsmd.getColumnCount();
+      for (int i = 1; i &lt;= cols; i++) {
+         System.out.println("NAME: " + rsmd.getColumnName(i) + " " + "TYPE: " + rsmd.getColumnTypeName(i));
+      }
+      rs.close();
+      stmt.close();
+   }
+   catch (Exception e) {
+      e.printStackTrace();
+   }
+}
+
+</pre></span></div></div></div><span id="seeAlsoSpan"><h1 class="heading">請參閱</h1></span><div id="seeAlsoSection" class="section" name="collapseableSection" style=""><div class="seeAlsoStyle"><span sdata="link"><a href="5cfb35d4-ddcd-40a2-8091-f29cddc32552.htm">使用 JDBC Driver 處理中繼資料</a></span></div></div></div><div id="footer" class="section"><span id="feedbackarea">將有關本主題的<a href="javascript:SubmitFeedback('DevDocs@Microsoft.com','','','','8.0.12060.10000','%0\d感謝您的意見反應。開發人員撰寫小組會使用您的意見反應改善文件集。檢閱意見反應的同時，我們可能會傳送電子郵件給您要求提供進一步說明或是解決方案的意見。電子郵件地址不會用於任何其他目的，檢閱後將會刪除。%0\A如需有關%20Microsoft%20隱私權原則的詳細資訊，請參閱%20http://privacy.microsoft.com/zh-tw/default.aspx。%0\A%0\d','客戶回函');">意見反應</a>傳送給 Microsoft。</span><span id="copyrightarea"><p><a href="9bad553b-9e70-4696-8499-2e35f772a1e0.htm">© 2012 Microsoft.著作權所有，並保留一切權利。</a></p></span></div></div></body></html>

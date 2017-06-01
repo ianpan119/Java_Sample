@@ -1,0 +1,32 @@
+﻿<html xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:MSHelp="http://msdn.microsoft.com/mshelp" xmlns:mshelp="http://msdn.microsoft.com/mshelp" xmlns:ddue="http://ddue.schemas.microsoft.com/authoring/2003/5" xmlns:msxsl="urn:schemas-microsoft-com:xslt"><head><META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8" /><META NAME="save" CONTENT="history" /><title>使用多個結果集</title><meta name="Language" content="zh-cht" /><meta name="System.Keywords" content="多個結果集" /><meta name="Microsoft.Help.Id" content="ab6a3cfa-073b-44e9-afca-a8675cfe5fd1" /><meta name="Description" content="使用會傳回多個結果集的內嵌 SQL 或 SQL Server 預存程序時，Microsoft JDBC Driver for SQL Server 會在 SQLServerStatement 類別中提供 getResultSet 方法，可用於擷取每一組傳回的資料。此外，執行會傳回多個結果集的陳述式時，您還可以使用 SQLServerStatement 類別的 execute 方法，因為它會傳回 boolean 值，指出所傳回的值是結果集還是更新計數。" /><meta name="Microsoft.Help.ContentType" content="Concepts" /><link rel="stylesheet" type="text/css" href="../local/Classic.css" /><script type="text/javascript" src="../scripts/EventUtilities.js">&amp;nbsp;</script><script type="text/javascript" src="../scripts/SplitScreen.js">&amp;nbsp;</script><script type="text/javascript" src="../scripts/Dropdown.js">&amp;nbsp;</script><script type="text/javascript" src="../scripts/script_manifold.js">&amp;nbsp;</script><script type="text/javascript" src="../scripts/script_feedBack.js">&amp;nbsp;</script><script type="text/javascript" src="../scripts/CheckboxMenu.js">&amp;nbsp;</script><script type="text/javascript" src="../scripts/CommonUtilities.js">&amp;nbsp;</script><script type="text/javascript" src="../local/script_main.js">&amp;nbsp;</script></head><body><div id="header"><table id="bottomTable" cellpadding="0" cellspacing="0"><tr><td align="left"><span id="headerBold">使用多個結果集</span></td></tr></table><table id="gradientTable"><tr><td class="nsrBottom" background="../icons/gradient.gif" /></tr></table></div><div id="mainSection"><div id="mainBody"><div class="introduction"><p>使用會傳回多個結果集的內嵌 SQL 或 SQL Server 預存程序時，Microsoft JDBC Driver for SQL Server 會在 <a href="ec24963c-8b51-4838-91e9-1fbfa2347451.htm">SQLServerStatement</a> 類別中提供 <a href="929a14e2-8e98-4c32-89aa-86733c717ec1.htm">getResultSet</a> 方法，可用於擷取每一組傳回的資料。此外，執行會傳回多個結果集的陳述式時，您還可以使用 <b>SQLServerStatement</b> 類別的 <a href="e1367f39-23d7-4e26-b160-6d988d7e6988.htm">execute</a> 方法，因為它會傳回 <span sdata="langKeyword" value="boolean"><span class="keyword">boolean</span></span> 值，指出所傳回的值是結果集還是更新計數。</p><p>如果 <b>execute</b> 方法傳回 <span sdata="langKeyword" value="true"><span class="keyword">true</span></span>，表示執行的陳述式傳回的是一或多個結果集。呼叫 <b>getResultSet</b> 方法，即可存取第一個結果集。若要判斷是否有多個結果集可供使用，可呼叫 <a href="6b18510a-4d6d-4eeb-a9d0-32e920eb0048.htm">getMoreResults</a> 方法，如果有多個可用的結果集，則這個方法會傳回值為 <span sdata="langKeyword" value="true"><span class="keyword">true</span></span> 的 <span sdata="langKeyword" value="boolean"><span class="keyword">boolean</span></span> 值。如果有多個結果集可供使用，您可以再次呼叫 <b>getResultSet</b> 方法進行存取，持續進行這個程序一直到處理完所有結果集為止。如果 <b>getMoreResults</b> 方法傳回 <span sdata="langKeyword" value="false"><span class="keyword">false</span></span>，表示已沒有需要處理的結果集。</p><p>如果 <b>execute</b> 方法傳回 <span sdata="langKeyword" value="false"><span class="keyword">false</span></span>，表示執行的陳述式傳回的是更新計數值，而您可以呼叫 <a href="e9570228-4500-44b6-b2f1-84ac050b5112.htm">getUpdateCount</a> 方法來擷取該值。</p><div style="margin: .5em 1.5em .5em 1.5em"><b></b><p>如需更新計數的詳細資訊，請參閱＜<span sdata="link"><a href="64cf4877-5995-4bfc-8865-b7618a5c8d01.htm">使用預存程序與更新計數</a></span>＞。</p></div><p>在下列範例中，連至 SQL Server 2005 AdventureWorks 範例資料庫的開啟連接會傳遞至函數，並建構了一個 SQL 陳述式，執行時會傳回兩個結果集：</p><div name="snippetGroup"><div class="sampleCode"><span codeLanguage="Java"><pre>public static void executeStatement(Connection con) {
+   try {
+      String SQL = "SELECT TOP 10 * FROM Person.Contact; " +
+                   "SELECT TOP 20 * FROM Person.Contact";
+      Statement stmt = con.createStatement();
+      boolean results = stmt.execute(SQL);
+      int rsCount = 0;
+
+      //Loop through the available result sets.
+     do {
+        if(results) {
+           ResultSet rs = stmt.getResultSet();
+           rsCount++;
+
+           //Show data from the result set.
+           System.out.println("RESULT SET #" + rsCount);
+           while (rs.next()) {
+              System.out.println(rs.getString("LastName") + ", " + rs.getString("FirstName"));
+           }
+           rs.close();
+        }
+        System.out.println();
+        results = stmt.getMoreResults();
+        } while(results);
+      stmt.close();
+      }
+   catch (Exception e) {
+      e.printStackTrace();
+   }
+}
+
+</pre></span></div></div><p>在此例中，已知傳回的結果集數量為二。不過，即使傳回未知數量的結果集 (例如呼叫預存程序時)，此程式碼的撰寫方式仍可處理所有的結果集。若要查看呼叫會傳回多個結果集與更新值的預存程序範例，請參閱＜<span sdata="link"><a href="6b807a45-a8b5-4b1c-8b7b-d8175c710ce0.htm">處理複雜陳述式</a></span>＞。</p><div style="margin: .5em 1.5em .5em 1.5em"><b></b><p>當您呼叫 <b>SQLServerStatement</b> 類別的 <b>getMoreResults</b> 方法時，先前傳回的結果集將會隱含地關閉。</p></div></div><span id="seeAlsoSpan"><h1 class="heading">請參閱</h1></span><div id="seeAlsoSection" class="section" name="collapseableSection" style=""><div class="seeAlsoStyle"><span sdata="link"><a href="7f8f3e8f-841e-4449-9154-b5366870121f.htm">搭配 JDBC Driver 使用陳述式</a></span></div></div></div><div id="footer" class="section"><span id="feedbackarea">將有關本主題的<a href="javascript:SubmitFeedback('DevDocs@Microsoft.com','','','','8.0.12060.10000','%0\d感謝您的意見反應。開發人員撰寫小組會使用您的意見反應改善文件集。檢閱意見反應的同時，我們可能會傳送電子郵件給您要求提供進一步說明或是解決方案的意見。電子郵件地址不會用於任何其他目的，檢閱後將會刪除。%0\A如需有關%20Microsoft%20隱私權原則的詳細資訊，請參閱%20http://privacy.microsoft.com/zh-tw/default.aspx。%0\A%0\d','客戶回函');">意見反應</a>傳送給 Microsoft。</span><span id="copyrightarea"><p><a href="9bad553b-9e70-4696-8499-2e35f772a1e0.htm">© 2012 Microsoft.著作權所有，並保留一切權利。</a></p></span></div></div></body></html>
